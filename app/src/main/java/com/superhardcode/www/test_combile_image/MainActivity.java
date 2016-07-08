@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 bmp = mainframe.getDrawingCache();
                 File mTempFile = new File(mTempDir, "TestMerge");
-                mSavedImageName = "/Test2.png";
+                mSavedImageName = "/Test3.png";
 
                 try {
 
