@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "JoinImage";
 
-    private RelativeLayout mainframe;
+    private LinearLayout mainframe;
     private ProgressDialog progress_dialog = null;
 
     private Bitmap mTopImage, mBackground;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createFloder();
         }
 
-        mainframe = (RelativeLayout) findViewById(R.id.mainframe);
+        mainframe = (LinearLayout) findViewById(R.id.mainframe);
         mainframe.setOnClickListener(this);
     }
 
@@ -75,42 +76,108 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void convertView2Image() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                Bitmap bmp = null;
+                mainframe.setDrawingCacheEnabled(true);
+                mainframe.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                mainframe.buildDrawingCache();
+
+                bmp = mainframe.getDrawingCache();
+                File mTempFile = new File(mTempDir, "TestMerge");
+                mSavedImageName = "/Test2.png";
+
+                try {
+
+                    mBitmapDrawable = new BitmapDrawable(bmp);
+                    Bitmap mNewSaving = mBitmapDrawable.getBitmap();
+
+                    String FtoSave = mTempFile.getPath() + mSavedImageName;
+                    File mFile = new File(FtoSave);
+                    if(mFile.exists())
+                        mFile.delete();
+
+                    mFileOutputStream = new FileOutputStream(mFile);
+                    mNewSaving.compress(Bitmap.CompressFormat.PNG, 80, mFileOutputStream);
+                    mFileOutputStream.flush();
+                    mFileOutputStream.close();
+
+                } catch(FileNotFoundException e) {
+                    Log.e(TAG, "FileNotFoundExceptionError " + e.toString());
+                } catch(IOException e) {
+                    Log.e(TAG, "IOExceptionError " + e.toString());
+                }
+
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+
+                        if(progress_dialog != null) {
+                            progress_dialog.dismiss();
+                            progress_dialog = null;
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void mergeImage() {
 
-        File mTempFile = new File(mTempDir, "TestMerge");
-        mSavedImageName = mTempFile.getPath() + "/Test.png";
+        new Thread(new Runnable() {
 
-        mTopImage = BitmapFactory.decodeResource(getResources(), R.drawable.mainlayer_ori);
-        Bitmap template = BitmapFactory.decodeResource(getResources(), R.drawable.bg_img_ori);
+            @Override
+            public void run() {
 
-        mBackground = Bitmap.createBitmap(template.getWidth(), template.getHeight(), Bitmap.Config.ARGB_8888);
+                File mTempFile = new File(mTempDir, "TestMerge");
+                mSavedImageName = "/Test1.png";
 
-        mCanvas = new Canvas(mBackground);
-        mCanvas.drawBitmap(template, 0f, 0f, null);
-        mCanvas.drawBitmap(mTopImage, 0f, 0f, null);
+                mTopImage = BitmapFactory.decodeResource(getResources(), R.drawable.mainlayer_ori);
+                Bitmap template = BitmapFactory.decodeResource(getResources(), R.drawable.bg_img_ori);
 
-        try {
-            mBitmapDrawable = new BitmapDrawable(mBackground);
-            Bitmap mNewSaving = mBitmapDrawable.getBitmap();
-            String FtoSave = mTempDir + mSavedImageName;
-            Log.e("ftosave", FtoSave);
+                mBackground = Bitmap.createBitmap(template.getWidth(), template.getHeight(), Bitmap.Config.ARGB_8888);
 
-            File mFile = new File(FtoSave);
-            mFileOutputStream = new FileOutputStream(mFile);
-            mNewSaving.compress(Bitmap.CompressFormat.PNG, 95, mFileOutputStream);
-            mFileOutputStream.flush();
-            mFileOutputStream.close();
+                mCanvas = new Canvas(mBackground);
+                mCanvas.drawBitmap(template, 0f, 0f, null);
+                mCanvas.drawBitmap(mTopImage, 0f, 0f, null);
 
-        } catch(FileNotFoundException e) {
-            Log.e(TAG, "FileNotFoundExceptionError " + e.toString());
-        } catch(IOException e) {
-            Log.e(TAG, "IOExceptionError " + e.toString());
-        }
+                try {
+                    mBitmapDrawable = new BitmapDrawable(mBackground);
+                    Bitmap mNewSaving = mBitmapDrawable.getBitmap();
+                    String FtoSave = mTempFile.getPath() + mSavedImageName;
+                    Log.e("ftosave", FtoSave);
 
-        if(progress_dialog != null) {
-            progress_dialog.dismiss();
-            progress_dialog = null;
-        }
+                    File mFile = new File(FtoSave);
+                    if(mFile.exists())
+                        mFile.delete();
+
+                    mFileOutputStream = new FileOutputStream(mFile);
+                    mNewSaving.compress(Bitmap.CompressFormat.PNG, 95, mFileOutputStream);
+                    mFileOutputStream.flush();
+                    mFileOutputStream.close();
+
+                } catch(FileNotFoundException e) {
+                    Log.e(TAG, "FileNotFoundExceptionError " + e.toString());
+                } catch(IOException e) {
+                    Log.e(TAG, "IOExceptionError " + e.toString());
+                }
+
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+
+                        if(progress_dialog != null) {
+                            progress_dialog.dismiss();
+                            progress_dialog = null;
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
@@ -119,7 +186,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(view.getId()) {
             case R.id.mainframe:
                 progress_dialog = ProgressDialog.show(this, "Merging", "Please, wait a minute.");
-                mergeImage();
+                //mergeImage();
+                convertView2Image();
                 break;
             default:
                 break;

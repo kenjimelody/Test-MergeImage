@@ -10,12 +10,15 @@
     tools:context="com.superhardcode.www.test_combile_image.MainActivity"
     >
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:id="@+id/mainframe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_img"
         android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:elevation="4dp"
         >
 
         <ImageView
@@ -23,9 +26,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:layout_centerHorizontal="true"
             />
 
-    </RelativeLayout>
+        <com.superhardcode.www.test_combile_image.widgets.SukhumvitHTMLTextView
+            android:text="@string/queenname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextDrawer.Widget.IntroTextTitle"
+            />
+
+    </LinearLayout>
 
 </RelativeLayout>

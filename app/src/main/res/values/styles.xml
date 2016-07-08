@@ -8,4 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TextDrawer" />
+    <style name="TextDrawer.Widget" />
+
+    <style name="TextDrawer.Widget.IntroTextTitle">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textAppearance">?android:attr/textAppearance</item>
+    </style>
+
 </resources>
